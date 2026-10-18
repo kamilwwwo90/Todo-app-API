@@ -16,7 +16,7 @@ konfiguracja bazy danych:
 
 żeby stworzyć dwie bazy danych:
 
-chociaż tylko jedna jest tak naprawde używana podczas testów.
+chociaż tylko jedna jest tak naprawdę używana podczas testów.
 
 ```bash
   docker compose up -d
@@ -28,6 +28,6 @@ Po wszystkim:
 go run ./cmd/server
 ```
 
-govulncheck może mieć problemy bez inicializacji modułu.
+mogą pojawić się ostrzeżenia od rozszerzenia go w vs code jeżeli moduł nie został zinicjializowany 
 
 Można wypróbować te API w server_test.go 
