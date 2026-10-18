@@ -96,23 +96,40 @@ func TestUpdateTask(t *testing.T) {
 
 	api.routes().ServeHTTP(w, req)
 
-	query := "SELECT title, description FROM tasks WHERE id= $1"
+	if w.Result().StatusCode != http.StatusOK {
+		t.Fatalf("expected status 200, got %d: %s", w.Code, w.Body.String())
+	}
+
+	query := "SELECT title FROM tasks WHERE id= $1"
 
 	row := api.db.QueryRow(query, taskID)
 
 	var task Task
 
-	scanErr := row.Scan(&task.Title, &task.Description)
+	scanErr := row.Scan(&task.Title)
 
 	if scanErr != nil {
 		t.Fatal(scanErr)
 	}
 
-	t.Log(task)
-
-	if w.Result().StatusCode != http.StatusOK {
-		t.Fatalf("expected status 200, got %d: %s", w.Code, w.Body.String())
+	switch update.Change {
+	case "title":
+		if task.Title != update.Value {
+			t.Fatalf("the change did not occur, expected %s to be: %v intead got: %v", update.Change, update.Value, task.Title)
+		}
+	case "description":
+		if task.Description != update.Value {
+			t.Fatalf("the change did not occur, expected %s to be: %v intead got: %v", update.Change, update.Value, task.Description)
+		}
+	case "done":
+		if task.Done != update.Value {
+			t.Fatalf("the change did not occur, expected %s to be: %v intead got: %v", update.Change, update.Value, task.Title)
+		}
+	default:
+		t.Fatalf("unsupported update field: %s", update.Change)
 	}
+
+	t.Log(task)
 }
 
 func TestGetTask(t *testing.T) {
