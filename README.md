@@ -10,7 +10,7 @@ potem należy przejść do folderu projektu
 cd Todo-app-API
 ```
 
-Set up bazy danych:
+konfiguracja bazy danych:
 
 .env.example musi być nazwany .env, docker-compose weźnie z niego DB_PASSWORD do stworzenia kontenera
 
@@ -28,6 +28,6 @@ Po wszystkim:
 go run ./cmd/server
 ```
 
-go vul check może mieć problemy bez inicializacji modułu.
+govulncheck może mieć problemy bez inicializacji modułu.
 
 Można wypróbować te API w server_test.go 
