@@ -8,6 +8,8 @@ import (
 	"net/http"
 	"time"
 
+	"TaskManager/structs"
+
 	"github.com/google/uuid"
 	"golang.org/x/crypto/bcrypt"
 )
@@ -15,31 +17,6 @@ import (
 type Api struct {
 	addr string
 	db   *sql.DB
-}
-
-type Task struct {
-	ID          string    `json:"id"`
-	Title       string    `json:"title"`
-	Description string    `json:"description"`
-	Done        bool      `json:"done"`
-	CreatedAt   time.Time `json:"created_at"`
-}
-
-type User struct {
-	UserID   int    `json:"user_id"`
-	Password string `json:"password"`
-	Email    string `json:"email"`
-	Name     string `json:"name"`
-}
-
-type ResponseUser struct {
-	Email string `json:"email"`
-	Name  string `json:"name"`
-}
-
-type UpdateObject struct {
-	Change string `json:"change"`
-	Value  any    `json:"value"`
 }
 
 func (a *Api) routes() http.Handler {
@@ -63,7 +40,7 @@ func (a *Api) routes() http.Handler {
 }
 
 func (a *Api) loginUser(w http.ResponseWriter, r *http.Request) {
-	var payload User
+	var payload structs.User
 
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -74,7 +51,7 @@ func (a *Api) loginUser(w http.ResponseWriter, r *http.Request) {
 
 	row := a.db.QueryRow(query, payload.Email)
 
-	u := User{}
+	u := structs.User{}
 
 	scanErr := row.Scan(&u.UserID, &u.Email, &u.Password, &u.Name)
 
@@ -98,7 +75,7 @@ func (a *Api) loginUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	respUser := ResponseUser{
+	respUser := structs.ResponseUser{
 		Name:  u.Name,
 		Email: u.Email,
 	}
@@ -162,7 +139,7 @@ func (a *Api) logoutUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) createUser(w http.ResponseWriter, r *http.Request) {
-	var payload User
+	var payload structs.User
 
 	if err := json.NewDecoder(r.Body).Decode(&payload); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -197,7 +174,7 @@ func (a *Api) createUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	u := ResponseUser{
+	u := structs.ResponseUser{
 		Email: payload.Email,
 		Name:  payload.Name,
 	}
@@ -216,7 +193,7 @@ func (a *Api) createUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (a *Api) createTask(w http.ResponseWriter, r *http.Request) {
-	var payload Task
+	var payload structs.Task
 
 	defer r.Body.Close()
 
@@ -232,7 +209,7 @@ func (a *Api) createTask(w http.ResponseWriter, r *http.Request) {
 
 	newGUID := uuid.NewString()
 
-	newTask := Task{
+	newTask := structs.Task{
 		ID:          newGUID,
 		Title:       payload.Title,
 		Description: payload.Description,
@@ -271,10 +248,10 @@ func (a *Api) getTasks(w http.ResponseWriter, r *http.Request) {
 
 	defer rows.Close()
 
-	tasks := []Task{}
+	tasks := []structs.Task{}
 
 	for rows.Next() {
-		t := Task{}
+		t := structs.Task{}
 
 		scanErr := rows.Scan(&t.ID, &t.Title, &t.Description, &t.Done, &t.CreatedAt)
 
@@ -301,7 +278,7 @@ func (a *Api) getTask(w http.ResponseWriter, r *http.Request) {
 
 	row := a.db.QueryRow(query, id, r.Context().Value(UserIdKey))
 
-	var t Task
+	var t structs.Task
 
 	err := row.Scan(&t.ID, &t.Title, &t.Description, &t.Done, &t.CreatedAt)
 
@@ -356,7 +333,7 @@ var whitelist = map[string]bool{
 func (a *Api) updateTask(w http.ResponseWriter, r *http.Request) {
 	taskID := r.PathValue("id")
 
-	var update UpdateObject
+	var update structs.UpdateObject
 
 	jsonErr := json.NewDecoder(r.Body).Decode(&update)
 

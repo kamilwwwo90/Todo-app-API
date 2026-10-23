@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"testing"
+
+	"TaskManager/structs"
 )
 
 var testName = "testName"
@@ -28,7 +30,7 @@ func TestGetTasks(t *testing.T) {
 		db:   db,
 	}
 
-	u := User{
+	u := structs.User{
 		Email:    testEmail,
 		Password: testPassword,
 	}
@@ -43,7 +45,7 @@ func TestGetTasks(t *testing.T) {
 
 	api.routes().ServeHTTP(w, req)
 
-	var payload []Task
+	var payload []structs.Task
 
 	decodingErr := json.NewDecoder(w.Result().Body).Decode(&payload)
 
@@ -68,12 +70,12 @@ func TestUpdateTask(t *testing.T) {
 		db:   db,
 	}
 
-	u := User{
+	u := structs.User{
 		Email:    testEmail,
 		Password: testPassword,
 	}
 
-	update := UpdateObject{
+	update := structs.UpdateObject{
 		Change: "title",
 		Value:  "anotherTitle",
 	}
@@ -104,7 +106,7 @@ func TestUpdateTask(t *testing.T) {
 
 	row := api.db.QueryRow(query, taskID)
 
-	var task Task
+	var task structs.Task
 
 	scanErr := row.Scan(&task.Title)
 
@@ -142,7 +144,7 @@ func TestGetTask(t *testing.T) {
 		db:   db,
 	}
 
-	u := User{
+	u := structs.User{
 		Email:    testEmail,
 		Password: testPassword,
 	}
@@ -159,7 +161,7 @@ func TestGetTask(t *testing.T) {
 
 	api.routes().ServeHTTP(w, req)
 
-	var payload Task
+	var payload structs.Task
 
 	decodingErr := json.NewDecoder(w.Result().Body).Decode(&payload)
 
@@ -184,7 +186,7 @@ func TestDeleteTask(t *testing.T) {
 		db:   db,
 	}
 
-	u := User{
+	u := structs.User{
 		Email:    testEmail,
 		Password: testPassword,
 	}
@@ -216,7 +218,7 @@ func TestCreateTask(t *testing.T) {
 		db:   db,
 	}
 
-	task := Task{
+	task := structs.Task{
 		Title:       "Test1234",
 		Description: "Test1234",
 		Done:        false,
@@ -230,7 +232,7 @@ func TestCreateTask(t *testing.T) {
 
 	req := httptest.NewRequest(http.MethodPost, "/tasks", bytes.NewBuffer(jsonData))
 
-	cookie := renewSession(t, User{
+	cookie := renewSession(t, structs.User{
 		Email:    testEmail,
 		Password: testPassword,
 	})
@@ -259,7 +261,7 @@ func TestLogout(t *testing.T) {
 		db:   db,
 	}
 
-	u := User{
+	u := structs.User{
 		Email:    testEmail,
 		Password: testPassword,
 	}
@@ -289,7 +291,7 @@ func TestLogin(t *testing.T) {
 		db:   db,
 	}
 
-	u := User{
+	u := structs.User{
 		Email:    testEmail,
 		Password: testPassword,
 	}
@@ -323,7 +325,7 @@ func TestSignup(t *testing.T) {
 		db:   db,
 	}
 
-	u := User{
+	u := structs.User{
 		Name:     testName,
 		Email:    testEmail,
 		Password: testPassword,

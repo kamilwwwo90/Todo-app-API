@@ -12,6 +12,8 @@ import (
 	"os"
 	"testing"
 
+	"TaskManager/structs"
+
 	"github.com/joho/godotenv"
 )
 
@@ -66,7 +68,7 @@ func createTestDB(t *testing.T) *sql.DB {
 	return db
 }
 
-func createTask(t *testing.T, title string, description string, user User) string {
+func createTask(t *testing.T, title string, description string, user structs.User) string {
 	t.Helper()
 
 	db := createTestDB(t)
@@ -78,7 +80,7 @@ func createTask(t *testing.T, title string, description string, user User) strin
 		db:   db,
 	}
 
-	task := Task{
+	task := structs.Task{
 		Title:       title,
 		Description: description,
 	}
@@ -106,7 +108,7 @@ func createTask(t *testing.T, title string, description string, user User) strin
 		t.Fatalf("expected status 200, got %d: %s", w.Code, w.Body.String())
 	}
 
-	var payload Task
+	var payload structs.Task
 
 	decodingErr := json.NewDecoder(resp.Body).Decode(&payload)
 
@@ -117,7 +119,7 @@ func createTask(t *testing.T, title string, description string, user User) strin
 	return payload.ID
 }
 
-func renewSession(t *testing.T, u User) string {
+func renewSession(t *testing.T, u structs.User) string {
 	t.Helper()
 
 	db := createTestDB(t)
